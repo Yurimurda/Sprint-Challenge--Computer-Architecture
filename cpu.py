@@ -38,7 +38,8 @@ class CPU:
         self.ram = [0] * 256
         self.reg[7] = 0xF4
         self.pc = 0
-        self.active = True
+        self.terminate = 0
+        self.halted = False
 
     def ram_read(self, address):
         return self.ram[address]
@@ -58,12 +59,16 @@ class CPU:
             for line in fp:
                 line_split = line.split("#") 
                 num = line_split[0]
-                if num == '':
+
+                try:
+                    val = int(num, 2)
+                    self.ram_write(val, address)
+                    address += 1
+                except:
                     continue
-                val = int(num, 2)
-                self.ram_write(val, address)
-                address += 1
-            print("end of load")
+        self.terminate = address
+        print("end of load")
+            
 
 
 
@@ -103,7 +108,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # The default state is on (active)
-        while  self.active:
+        while  self.halted:
             instruction = self.ram[self.pc]
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
