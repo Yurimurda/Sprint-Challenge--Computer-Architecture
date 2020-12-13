@@ -6,6 +6,9 @@ import sys
 from cpu import *
 
 
+cpu = CPU()
+
+
 if (len(sys.argv) != 2):
     print("no valid file address")
     sys.exit(1)
@@ -16,11 +19,13 @@ else:
     cpu.run()
 
 
-console_args = sys.argv[1]
-cpu = CPU()
+# console_args = sys.argv[1]
 
-cpu.load(console_args)
-cpu.run()
+
+# cpu.load(console_args)
+# cpu.run()
+
+
 
 
 # run python ls8.py examples/print8.ls8

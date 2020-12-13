@@ -57,7 +57,7 @@ class CPU:
             print("File Open")
             for line in fp:
                 line_split = line.split("#") 
-                num = line_split[0].strip()
+                num = line_split[0]
                 if num == '':
                     continue
                 val = int(num, 2)
