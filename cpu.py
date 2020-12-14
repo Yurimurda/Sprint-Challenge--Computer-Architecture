@@ -11,6 +11,8 @@
 
 import sys
 
+
+
 # Push
 PUSH = 0b01000101
 
@@ -41,6 +43,8 @@ JEQ = 0b01010101
 # 
 JNE = 0b01010110
 
+# fl = Flag
+
 # mar = Memory Address Register
 
 # mdr = Memory Data Register
@@ -61,6 +65,7 @@ class CPU:
         self.terminate = 0
         self.halted = False
         self.ir = 0
+        self.fl = 0b00000001
 
     def ram_read(self, mar):
         return self.ram[mar]
@@ -99,6 +104,10 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            if self.reg[reg_a] < self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -170,4 +179,4 @@ class CPU:
                 self.alu(instruction, operand_a, operand_b)
             else:
                 print("Bad Instruction")
-            self.pc += num_operands
+            self.pc += num_operands + 1
