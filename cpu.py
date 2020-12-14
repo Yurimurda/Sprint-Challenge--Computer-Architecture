@@ -29,6 +29,18 @@ PRN = 0b01000111
 # Multiply 
 MUL = 0b10100010
 
+# 
+CMP = 0b10100111
+
+# 
+JMP = 0b01010100
+
+# 
+JEQ = 0b01010101
+
+# 
+JNE = 0b01010110
+
 # mar = Memory Address Register
 
 # mdr = Memory Data Register
