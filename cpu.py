@@ -29,23 +29,32 @@ PRN = 0b01000111
 # Multiply 
 MUL = 0b10100010
 
+# mar = Memory Address Register
+
+# mdr = Memory Data Register
+
+# ir = instruction register
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        self.reg = [0] * 25
+        self.reg = [0] * 8
         self.ram = [0] * 256
         self.reg[7] = 0xF4
         self.pc = 0
+        self.mar = 0
+        self.mdr = 0
         self.terminate = 0
         self.halted = False
+        self.ir = 0
 
-    def ram_read(self, address):
-        return self.ram[address]
+    def ram_read(self, mar):
+        return self.ram[mar]
 
-    def ram_write(self, address, val):
-        self.ram[address] = val
+    def ram_write(self, mdr, mar):
+        self.ram[mar] = mdr
 
 
 
@@ -108,23 +117,45 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # The default state is on (active)
-        while  self.halted:
-            instruction = self.ram[self.pc]
+        while not self.halted:
+            ir = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
+            self.execute_instruction(ir, operand_a, operand_b)
 
-    
+
+    def execute_instruction(self, instruction, operand_a, operand_b):
+
+        is_alu = instruction >> 5 & 0b1
+        sets_pc = instruction >> 4 & 0b1
+        num_operands = (instruction >> 6 & 0b11) + 1
+
+        if not sets_pc:
             if instruction == HLT:
                 # Halting goes here, Exits Simulator 
-                self.active = False
-                self.pc += 1
+                self.halted = True
+            elif instruction == PRN:
+                print(self.reg[operand_a])
             elif instruction == LDI:
                 # LDI sets value of register to an interger 
                 self.reg[operand_a] = operand_b
-                self.pc += 3
-            elif instruction == PRN:
-                print(operand_a)
-                self.pc += 2 
-            elif instruction == MUL:
-                register = self.reg[operand_a] + self.reg[operand_b]
-                print(register)
+            elif instruction == PUSH:
+                if self.reg[7] > self.terminate + 1: 
+                    self.reg[7] -= 1
+                else:
+                    sys.exit(1)
+                register_address = self.ram[self.pc + 1]
+                value = self.reg[register_address]
+                self.ram[self.reg[7]] = value
+            elif instruction == POP:
+                register_address = self.ram[self.pc + 1]
+                self.reg[register_address] = self.ram[self.reg[7]]
+                if self.reg[7] < 0xF4: 
+                    self.reg[7] += 1
+                else:
+                    sys.exit(1)
+            elif is_alu:
+                self.alu(instruction, operand_a, operand_b)
+            else:
+                print("Bad Instruction")
+            self.pc += num_operands
